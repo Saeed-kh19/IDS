@@ -43,6 +43,13 @@ def parse_args():
         choices=["none", "tabulate", "rich"],
         help="Pretty printing mode for final report: none, tabulate, or rich.",
     )
+    parser.add_argument(
+        "--pretty",
+        type=str,
+        default="tabulate",
+        choices=["none", "tabulate", "rich"],
+        help="Pretty printing mode for final report: none, tabulate, or rich.",
+    )
     return parser.parse_args()
 
 
@@ -52,6 +59,7 @@ def main():
     target_column = args.target
     top_k = args.top_k
     save_model_path = args.save_model
+    pretty = args.pretty
     pretty = args.pretty
 
     print("=== IoTID20 IDS: Orchestration Start ===")
@@ -69,6 +77,7 @@ def main():
     feature_selector = None
     if top_k is not None and top_k > 0:
         feature_selector = TopFeatureSelector(num_features=top_k, random_state=42, verbose=True)
+        feature_selector = TopFeatureSelector(num_features=top_k, random_state=42, verbose=True)
         print(f"[INFO] Feature selection enabled: Top {top_k} features will be used.")
     else:
         print("[INFO] Feature selection disabled: Using all features.")
@@ -83,6 +92,7 @@ def main():
     metrics = evaluate_on_test(best_pipeline, X_test, y_test, pretty=pretty)
 
     print("\n=== SUMMARY METRICS ===")
+    pprint({k: v for k, v in metrics.items() if k != "report"})
     pprint({k: v for k, v in metrics.items() if k != "report"})
 
     if save_model_path:
