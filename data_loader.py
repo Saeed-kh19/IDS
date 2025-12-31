@@ -1,11 +1,12 @@
 import pandas as pd
+import numpy as np
 import re
 
 
 def load_dataset(csv_path: str) -> pd.DataFrame:
     dataframe = pd.read_csv(csv_path)
 
-    # Clean column names: remove spaces, slashes, duplicates, lowercase
+    # Clean column names
     cleaned_columns = []
     seen = {}
 
@@ -23,7 +24,11 @@ def load_dataset(csv_path: str) -> pd.DataFrame:
 
     dataframe.columns = cleaned_columns
 
+    # 🔥 VERY IMPORTANT: replace inf with NaN
+    dataframe.replace([np.inf, -np.inf], np.nan, inplace=True)
+
     print(f"[INFO] Dataset loaded with shape: {dataframe.shape}")
+    print(f"[INFO] Infinite values replaced with NaN")
     print(f"[INFO] Target column renamed to: label")
 
     return dataframe
