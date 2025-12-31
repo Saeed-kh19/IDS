@@ -1,29 +1,16 @@
-# feature_selection.py
-"""
-Feature selection utilities for IoTID20 IDS project.
-Handles:
-- Ranking features using RandomForest importance
-- Selecting top-k features
-- Integration with sklearn Pipeline via custom transformer
-"""
-
 import numpy as np
 from sklearn.base import BaseEstimator, TransformerMixin
 from sklearn.ensemble import RandomForestClassifier
 
 
 class TopFeatureSelector(BaseEstimator, TransformerMixin):
-    """
-    Custom transformer for selecting top-k features based on RandomForest importance.
-    Can be used inside sklearn Pipeline.
-    """
-
+    
     def __init__(self, num_features=20, random_state=42, verbose=True):
         self.num_features = num_features
         self.random_state = random_state
         self.selected_indices_ = None
         self.verbose = verbose
-        self._printed_once = False  # internal flag to avoid repeated logs
+        self._printed_once = False
 
     def fit(self, X, y):
         rf = RandomForestClassifier(
@@ -35,10 +22,8 @@ class TopFeatureSelector(BaseEstimator, TransformerMixin):
         rf.fit(X, y)
         importances = rf.feature_importances_
 
-        # Sort features by importance
         self.selected_indices_ = np.argsort(importances)[::-1][:self.num_features]
 
-        # Print only once
         if self.verbose and not self._printed_once:
             print(f"[INFO] Top {self.num_features} features selected based on RandomForest importance.")
             self._printed_once = True
@@ -52,10 +37,7 @@ class TopFeatureSelector(BaseEstimator, TransformerMixin):
 
 
 def select_top_features(X, y, num_features=20, verbose=True):
-    """
-    Standalone function for feature selection (outside pipeline).
-    Returns indices of top-k features.
-    """
+    
     rf = RandomForestClassifier(
         n_estimators=200,
         random_state=42,
